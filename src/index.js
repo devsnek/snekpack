@@ -1,8 +1,6 @@
+const fs = require('fs');
 const hbs = require('handlebars');
-const outputTemplate = hbs.compile(
-  fs.readFileSync(require.resolve('./templates/output.hbs')).toString(),
-  { noEscape: true }
-);
+const outputTemplate = hbs.compile(open('./templates/output.hbs'), { noEscape: true });
 
 const REQUIRE_RE = /require\(['"](.+?)['"]\)/g;
 
@@ -27,10 +25,15 @@ function snekpack(name) {
   modules.entry = modules.indexOf(modules.get(name));
   return outputTemplate({
     modules: modules
-      .map(m => `function(module, exports, __snekpack_require__) {\n  ${m.src.trim().split('\n').join('\n  ')}\n}`)
+      .map(m => `function(module, exports, __snekpack_require__) {\n  ${m.src.trim().replace(/\n/g, '\n  ')}\n}`)
       .join(',\n'),
     entry: modules.entry,
+    __snekpack_require__: open('./templates/__snekpack_require__.js').replace(/\n/g, '\n  '),
   });
+}
+
+function open(filename) {
+  return fs.readFileSync(require.resolve(filename)).toString().trim();
 }
 
 module.exports = snekpack;
