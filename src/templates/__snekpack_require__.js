@@ -15,5 +15,6 @@ function __snekpack_require__(id) {
 
   return module.exports.__esModule ? module.exports.default : module.exports;
 }
+__snekpack_require__.cache = installed;
 
 __snekpack_require__(__snekpack_require__.entry = {{entry}});
